@@ -1,7 +1,7 @@
-﻿<?php
+<?php
 
 require_once('api/Simpla.php');
-require_once(__DIR__ . DS . 'begateway-api-php' . DS . 'lib' . DS . 'beGateway.php');
+require_once(__DIR__ . '/begateway-api-php/lib/beGateway.php');
 
 class BeGateway extends Simpla
 {
@@ -36,10 +36,10 @@ class BeGateway extends Simpla
     	return array('error'=>true);
 
     $payment_method = $this->payment->get_payment_method($order->payment_method_id);
-    if (empty($method))
+    if (empty($payment_method))
     	return array('error'=>true);
 
-    $payment_currency = $simpla->money->get_currency(intval($payment_method->currency_id));
+    $payment_currency = $this->money->get_currency(intval($payment_method->currency_id));
     $settings = $this->payment->get_payment_settings($payment_method->id);
 
     \beGateway\Settings::$shopId = $settings['shop_id'];
@@ -60,7 +60,7 @@ class BeGateway extends Simpla
     $transaction->money->setAmount($order->total_price);
     $transaction->money->setCurrency(str_replace("RUR", "RUB", $payment_currency->code));
     $transaction->setDescription($desc);
-    $transaction->setTrackingId("$order_id|$order->payment_method_id");
+    $transaction->setTrackingId("$this->_order_id|$order->payment_method_id");
     $transaction->setLanguage('ru');
     $transaction->setNotificationUrl($server_url);
     $transaction->setSuccessUrl($result_url);
@@ -88,7 +88,7 @@ class BeGateway extends Simpla
       $erip = new \beGateway\PaymentMethod\Erip(array(
         'order_id' => $order_id,
         'account_number' => strval($order_id),
-        'service_no' => $settings['pm_erip_service_no']
+        'service_no' => $settings['pm_erip_service_no'],
         'service_info' => array($desc)
       ));
       $transaction->addPaymentMethod($erip);
@@ -97,6 +97,7 @@ class BeGateway extends Simpla
     $response = $transaction->submit();
 
     if (!$response->isSuccess()) {
+      echo '<!--' . $response->getMessage() . '-->';
       return array('error'=>true);
     }
 

@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . DS . 'begateway-api-php' . DS . 'lib' . DS . 'beGateway.php');
+require_once(__DIR__ . '/begateway-api-php/lib/beGateway.php');
 // Работаем в корневой директории
 chdir ('../../');
 require_once('api/Simpla.php');
@@ -9,7 +9,7 @@ $webhook = new \beGateway\Webhook;
 
 // Сумма, которую заплатил покупатель. Дробная часть отделяется точкой.
 $money = new \beGateway\Money;
-$money->setCents($webhook->getResponse()->transacton->amount);
+$money->setCents($webhook->getResponse()->transaction->amount);
 $money->setCurrency($webhook->getResponse()->transaction->currency);
 
 $amount = $money->getAmount();
