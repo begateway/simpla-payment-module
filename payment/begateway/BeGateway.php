@@ -1,7 +1,7 @@
 <?php
 
 require_once('api/Simpla.php');
-require_once(__DIR__ . '/begateway-api-php/lib/beGateway.php');
+require_once(__DIR__ . '/begateway-api-php/lib/BeGateway.php');
 
 class BeGateway extends Simpla
 {
@@ -42,9 +42,9 @@ class BeGateway extends Simpla
     $payment_currency = $this->money->get_currency(intval($payment_method->currency_id));
     $settings = $this->payment->get_payment_settings($payment_method->id);
 
-    \beGateway\Settings::$shopId = $settings['shop_id'];
-    \beGateway\Settings::$shopKey = $settings['shop_key'];
-    \beGateway\Settings::$checkoutBase = 'https://' . $settings['domain_checkout'];
+    \BeGateway\Settings::$shopId = $settings['shop_id'];
+    \BeGateway\Settings::$shopKey = $settings['shop_key'];
+    \BeGateway\Settings::$checkoutBase = 'https://' . $settings['domain_checkout'];
 
     $desc = 'Оплата заказа №'.$order->id;
     $result_url = $this->config->root_url.'/order/'.$order->url;
@@ -55,7 +55,7 @@ class BeGateway extends Simpla
     $firstname = trim($fio_arr[0]);
     $lastname = trim($fio_arr[1]);
 
-    $transaction = new \beGateway\GetPaymentToken;
+    $transaction = new \BeGateway\GetPaymentToken;
 
     $transaction->money->setAmount($order->total_price);
     $transaction->money->setCurrency(str_replace("RUR", "RUB", $payment_currency->code));
@@ -72,20 +72,21 @@ class BeGateway extends Simpla
     $transaction->customer->setLastName($lastname);
     $transaction->customer->setEmail($order->email);
     $transaction->customer->setPhone($order->phone);
-    $transaction->setAddressHidden();
+
+    $transaction->setTestMode($settings['test_mode'] == 1);
 
     if ($settings['pm_bankcard']) {
-      $cc = new \beGateway\PaymentMethod\CreditCard;
+      $cc = new \BeGateway\PaymentMethod\CreditCard;
       $transaction->addPaymentMethod($cc);
     }
 
     if ($settings['pm_bankcard_halva']) {
-      $halva = new \beGateway\PaymentMethod\CreditCardHalva;
+      $halva = new \BeGateway\PaymentMethod\CreditCardHalva;
       $transaction->addPaymentMethod($halva);
     }
 
     if ($settings['pm_erip']) {
-      $erip = new \beGateway\PaymentMethod\Erip(array(
+      $erip = new \BeGateway\PaymentMethod\Erip(array(
         'order_id' => $order_id,
         'account_number' => strval($order_id),
         'service_no' => $settings['pm_erip_service_no'],

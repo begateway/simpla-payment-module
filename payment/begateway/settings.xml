@@ -53,4 +53,16 @@
 		<variable>pm_erip_service_no</variable>
 		<name>Код услуги ЕРИП</name>
 	</settings>
+	<settings>
+		<variable>test_mode</variable>
+		<name>Тестовый режим оплаты</name>
+    <options>
+      <name>Да</name>
+      <value>1</value>
+    </options>
+    <options>
+      <name>Нет</name>
+      <value>0</value>
+    </options>
+	</settings>
 </module>

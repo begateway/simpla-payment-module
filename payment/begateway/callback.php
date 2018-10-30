@@ -5,10 +5,10 @@ chdir ('../../');
 require_once('api/Simpla.php');
 $simpla = new Simpla();
 
-$webhook = new \beGateway\Webhook;
+$webhook = new \BeGateway\Webhook;
 
 // Сумма, которую заплатил покупатель. Дробная часть отделяется точкой.
-$money = new \beGateway\Money;
+$money = new \BeGateway\Money;
 $money->setCents($webhook->getResponse()->transaction->amount);
 $money->setCurrency($webhook->getResponse()->transaction->currency);
 
@@ -50,8 +50,8 @@ if(round($simpla->money->convert($order->total_price, $method->currency_id, fals
 
 $settings = unserialize($method->settings);
 
-\beGateway\Settings::$shopId = $settings['shop_id'];
-\beGateway\Settings::$shopKey = $settings['shop_key'];
+\BeGateway\Settings::$shopId = $settings['shop_id'];
+\BeGateway\Settings::$shopKey = $settings['shop_key'];
 
 // Проверяем авторизационные данные
 if (!$webhook->isAuthorized())
