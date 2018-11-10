@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/begateway-api-php/lib/beGateway.php');
+require_once(__DIR__ . '/begateway-api-php/lib/BeGateway.php');
 // Работаем в корневой директории
 chdir ('../../');
 require_once('api/Simpla.php');
