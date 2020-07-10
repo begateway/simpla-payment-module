@@ -1,0 +1,4 @@
+AddType application/octet-stream csv
+AuthName "Simpla CMS"
+AuthType Basic
+AuthUserFile /var/www/html/simpla/simpla/.passwd
