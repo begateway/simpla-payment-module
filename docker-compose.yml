@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  simpla: &simpla
+    build: &build
+      context: ./docker
+      dockerfile: Dockerfile
+    environment:
+      TZ: 'Etc/GMT'
+    depends_on:
+      - mysql
+    ports:
+      - 80:80
+    tty: true
+    volumes:
+     - ./payment/BeGateway:/var/www/html/payment/BeGateway
+
+  simpla_238:
+    build:
+      args:
+        version: "2.3.8"
+      <<: *build
+    <<: *simpla
+
+  mysql:
+    image: mysql:5.5
+    volumes:
+      - /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: simpla
