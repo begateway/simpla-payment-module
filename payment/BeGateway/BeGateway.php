@@ -33,11 +33,11 @@ class BeGateway extends Simpla
   private function _get_form() {
     $order = $this->orders->get_order($this->_order_id);
     if (empty($order))
-    	return array('error'=>true);
+    	return array('error'=>true, 'message'=>"Заказ {$this->_order_id} не найден");
 
     $payment_method = $this->payment->get_payment_method($order->payment_method_id);
     if (empty($payment_method))
-    	return array('error'=>true);
+    	return array('error'=>true, 'message'=>'Способ оплаты не найден');
 
     $payment_currency = $this->money->get_currency(intval($payment_method->currency_id));
     $settings = $this->payment->get_payment_settings($payment_method->id);
@@ -49,7 +49,7 @@ class BeGateway extends Simpla
     $desc = 'Оплата заказа №'.$order->id;
     $result_url = $this->config->root_url.'/order/'.$order->url;
     $server_url = $this->config->root_url.'/payment/BeGateway/callback.php';
-    $server_url = str_replace('simplacms.local', 'simplacms.webhook.begateway.com:8443', $server_url);
+    $server_url = str_replace('0.0.0.0', 'simplacms.webhook.begateway.com:8443', $server_url);
 
     $fio_arr = explode(" ", $order->name);
     $firstname = trim($fio_arr[0]);
@@ -60,7 +60,7 @@ class BeGateway extends Simpla
     $transaction->money->setAmount($order->total_price);
     $transaction->money->setCurrency(str_replace("RUR", "RUB", $payment_currency->code));
     $transaction->setDescription($desc);
-    $transaction->setTrackingId("$this->_order_id|$order->payment_method_id");
+    $transaction->setTrackingId("$order->id|$order->payment_method_id");
     $transaction->setLanguage('ru');
     $transaction->setNotificationUrl($server_url);
     $transaction->setSuccessUrl($result_url);
@@ -87,8 +87,8 @@ class BeGateway extends Simpla
 
     if ($settings['pm_erip']) {
       $erip = new \BeGateway\PaymentMethod\Erip(array(
-        'order_id' => $order_id,
-        'account_number' => strval($order_id),
+        'order_id' => $order->id,
+        'account_number' => strval($order->id),
         'service_no' => $settings['pm_erip_service_no'],
         'service_info' => array($desc)
       ));
@@ -99,7 +99,7 @@ class BeGateway extends Simpla
 
     if (!$response->isSuccess()) {
       echo '<!--' . $response->getMessage() . '-->';
-      return array('error'=>true);
+      return array('error'=>true, 'message' => $response->getMessage());
     }
 
     return array(
